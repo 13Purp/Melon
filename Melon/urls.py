@@ -24,6 +24,7 @@ urlpatterns = [
     path('', views.landingPage, name="landingPage"),
     path('admin/', admin.site.urls),
     path('oNama/', views.aboutPage, name="aboutPage"),
+    path('dodajPopust/', views.dodajPopust, name="dodajPopust"),
     path('sveZivo/', views.sveZivo, name="sveZivo"),
     path('clan/', views.clan, name="clan"),
     path('vesti/', views.vesti, name="vesti"),

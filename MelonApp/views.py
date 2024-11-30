@@ -53,3 +53,7 @@ def opomene(request):
 
 def faq(request):
     return None
+
+
+def dodajPopust(request):
+    return render(request, 'dodajPopust.html')

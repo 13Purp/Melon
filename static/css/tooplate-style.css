@@ -38,6 +38,8 @@ a:focus {
 .tm-bg-primary { background: #57a13d; }
 .tm-bg-gray { background: #F4F4F4; }
 .tm-bg-white { background: white; }
+.tm-bg-green { background: #57a13d; }
+
 .tm-bg-dark-blue { background: #1f3646; }
 
 .tm-bg-white-shadow {
