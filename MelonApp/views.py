@@ -8,7 +8,6 @@ def landingPage(request):
 
 
 def aboutPage(request):
-
     return render(request, 'oNama.html')
 
 

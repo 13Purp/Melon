@@ -78,7 +78,7 @@
                                           <span>100</span>
                                           <span>57</span>
                                           <span>24%</span>
-                                          <span><button class="tm-btn-white-bordered"> Detalji</button></span>
+                                          <span><button class="tm-btn-white-bordered" onclick="showModal(1)"> Detalji</button></span>
 
                                         </div>
                                       </li>
@@ -88,7 +88,7 @@
                                           <span>150</span>
                                           <span>23</span>
                                           <span>65%</span>
-                                          <span><button class="tm-btn-white-bordered"> Detalji</button></span>
+                                          <span><button class="tm-btn-white-bordered" onclick="showModal(1)"> Detalji</button></span>
 
                                         </div>
                                       </li>
@@ -113,6 +113,69 @@
                         </div>
                 </div>
             </div>
+            <div id="detailsModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content tm-bg-white-shadow">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Detalji Popusta</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p><strong>ID:</strong> <span id="discountId"></span></p>
+                      <p><strong>Datum Od:</strong> <span id="startDate"></span></p>
+                      <p><strong>Datum Do:</strong> <span id="endDate"></span></p>
+                      <p><strong>Kompanije:</strong></p>
+                      <ul id="companiesList" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">Zatvori</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <script>
+                // Dummy podaci
+                const discountDetails = {
+                  1: {
+                    id: 1,
+                    startDate: "2024-12-01",
+                    endDate: "2024-12-31",
+                    companies: ["Firma A", "Firma B"],
+                  },
+                  2: {
+                    id: 2,
+                    startDate: "2024-11-01",
+                    endDate: "2024-12-15",
+                    companies: ["Firma X", "Firma Y", "Firma Z"],
+                  },
+                };
+              
+                // Funkcija za prikaz modalnog prozora
+                function showModal(id) {
+                  const details = discountDetails[id];
+              
+                  // Popunjavanje modalnog prozora
+                  document.getElementById("discountId").innerText = details.id;
+                  document.getElementById("startDate").innerText = details.startDate;
+                  document.getElementById("endDate").innerText = details.endDate;
+              
+                  const companiesList = document.getElementById("companiesList");
+                  companiesList.innerHTML = ""; // Reset liste kompanija
+                  details.companies.forEach((company) => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.innerText = company;
+                    companiesList.appendChild(li);
+                  });
+              
+                  // Prikazivanje modalnog prozora
+                  const modal = new bootstrap.Modal(document.getElementById("detailsModal"));
+                  modal.show();
+                }
+              </script>
             <div class="green-line"></div>
         <div >
             <footer class="tm-bg-dark-blue">
