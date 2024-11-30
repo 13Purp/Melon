@@ -309,10 +309,13 @@ select.tm-select::-ms-expand { display: none; }
 
 .tm-btn-white-bordered {
 	display: inline-block;
-	padding: 10px 25px;
-	border: 2px solid white;
+	padding: 5px 25px;
+	border: 2px solid ;
+	border-color:#57a13d ;
+	border-radius: 10px;
 	background: transparent;
 	text-transform: uppercase;
+	cursor: pointer;
 }
 
 .tm-btn-white-bordered:hover,
