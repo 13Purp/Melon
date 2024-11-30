@@ -26,19 +26,8 @@ urlpatterns = [
     path('oNama/', views.aboutPage, name="aboutPage"),
     path('sveZivo/', views.sveZivo, name="sveZivo"),
     path('clan/', views.clan, name="clan"),
-    path('clanovi/', views.members, name="members"),
-    path('turniri/', views.tournaments, name="tournaments"),
-    path('najave/', views.najave, name="najave"),
-    path('kalendar/', views.kalendar, name="kalendar"),
-    path('matchup/', views.matchup, name="matchup"),
     path('vesti/', views.vesti, name="vesti"),
-    path('galerija/', views.galerija, name="galerija"),
-    path('propozicije/',views.propozicije,name="propozicije"),
-    path('brisanjeBodova/',views.brisanjeBodova,name="brisanjeBodova"),
-    path('pravilnik/',views.pravilnik,name="pravilnik"),
-    path('kategorije/',views.kategorije,name="kategorije"),
-    path('opomene/',views.opomene,name="opomene"),
-    path('faq/',views.faq,name="faq")
+
 ]
 
 #if settings.DEBUG:
