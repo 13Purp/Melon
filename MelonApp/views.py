@@ -1,12 +1,14 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+
+
 def landingPage(request):
-    return render(request,'index.html')
+    return render(request, 'index.html')
 
 
 def aboutPage(request):
-    return render(request,'oNama.html')
+    return render(request, 'oNama.html')
 
 
 def sveZivo(request):
@@ -43,7 +45,6 @@ def kalendar(request):
 
 def galerija(request):
     return None
-
 
 
 def opomene(request):
