@@ -21,6 +21,7 @@ from MelonApp import views
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('<int:promo_id>', views.get_promo_details, name='get_promo_details'),
     path('', views.landingPage, name="landingPage"),
     path('admin/', admin.site.urls),
     path('oNama/', views.aboutPage, name="aboutPage"),

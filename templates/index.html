@@ -136,7 +136,7 @@
                                                     {{ prom.procenat_popust }}%
                                                 {% endif %}
                                           </span>
-                                          <span><button class="tm-btn-white-bordered" onclick="showModal({{ prom.id }})"> Detalji</button></span>
+                                          <span><button class="tm-btn-white-bordered" onclick="showModal('{{ prom.id }}')"> Detalji</button></span>
 
                                         </div>
                                       </li>
@@ -166,6 +166,7 @@
                         </div>
                 </div>
             </div>
+            <div class="modal-overlay"></div>
             <div id="detailsModal" class="modal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content tm-bg-white-shadow">
@@ -183,52 +184,47 @@
                       <ul id="companiesList" class="list-group"></ul>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" data-dismiss="modal">Zatvori</button>
+                      <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="closeModal()">Zatvori</button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <script>
-                // Dummy podaci
-                const discountDetails = {
-                  1: {
-                    id: 1,
-                    startDate: "2024-12-01",
-                    endDate: "2024-12-31",
-                    companies: ["Firma A", "Firma B"],
-                  },
-                  2: {
-                    id: 2,
-                    startDate: "2024-11-01",
-                    endDate: "2024-12-15",
-                    companies: ["Firma X", "Firma Y", "Firma Z"],
-                  },
-                };
-              
-                // Funkcija za prikaz modalnog prozora
-                function showModal(id) {
-                  const details = discountDetails[id];
-              
-                  // Popunjavanje modalnog prozora
-                  document.getElementById("discountId").innerText = details.id;
-                  document.getElementById("startDate").innerText = details.startDate;
-                  document.getElementById("endDate").innerText = details.endDate;
-              
-                  const companiesList = document.getElementById("companiesList");
-                  companiesList.innerHTML = ""; // Reset liste kompanija
-                  details.companies.forEach((company) => {
-                    const li = document.createElement("li");
-                    li.className = "list-group-item";
-                    li.innerText = company;
-                    companiesList.appendChild(li);
-                  });
-              
-                  // Prikazivanje modalnog prozora
-                  const modal = new bootstrap.Modal(document.getElementById("detailsModal"));
-                  modal.show();
+              async function showModal(promoId) {
+                  try {
+                    const response = await fetch(`${promoId}`);
+                    if (!response.ok) {
+                      throw new Error("Greška prilikom dohvatanja podataka o promociji.");
+                    }
+                    const data = await response.json();                 
+                    document.getElementById("discountId").innerText = data.id;
+                    document.getElementById("startDate").innerText = data.od || "N/A";
+                    document.getElementById("endDate").innerText = data.do || "N/A";                  
+                    const companiesList = document.getElementById("companiesList");
+                    companiesList.innerHTML = "";
+                    data.firme.forEach(firma => {
+                      const li = document.createElement("li");
+                      li.className = "list-group-item";
+                      li.textContent = firma.naziv;
+                      companiesList.appendChild(li);
+                    });                 
+                    // Prikazivanje modala i overlay-a
+                    document.querySelector(".modal-overlay").style.display = "block";
+                    document.getElementById("detailsModal").style.display = "block";
+                    document.body.classList.add("modal-open");
+                  } catch (error) {
+                    console.error("Greška:", error);
+                  }
                 }
-              </script>
+
+                function closeModal() {
+                    document.querySelector(".modal-overlay").style.display = "none";
+                    document.getElementById("detailsModal").style.display = "none";
+                    document.body.classList.remove("modal-open");
+                }
+
+            </script>
             <div class="green-line"></div>
         <div >
             <footer class="tm-bg-dark-blue">
