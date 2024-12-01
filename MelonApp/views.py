@@ -52,7 +52,8 @@ def get_promo_details(request, promo_id):
     }
     return JsonResponse(data)
 
-
+def dodajPromociju(request):
+    pass
 
 def aboutPage(request):
     return render(request, 'oNama.html')
