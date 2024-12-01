@@ -28,6 +28,7 @@ urlpatterns = [
     path('sveZivo/', views.sveZivo, name="sveZivo"),
     path('clan/', views.clan, name="clan"),
     path('vesti/', views.vesti, name="vesti"),
+    path('login/', views.loginPage, name="login"),
 
 ]
 

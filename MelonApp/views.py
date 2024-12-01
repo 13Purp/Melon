@@ -1,10 +1,35 @@
-from django.http import HttpResponse
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
+
+from MelonApp.models import Firma, Pos, Promocija
 
 
+@login_required
 def landingPage(request):
-    return render(request, 'index.html')
+    firma = Firma.objects.filter(username=request.user.username).first()
+
+    context = {}
+    if firma:
+        context['strana_sveta'] = firma.strana_sveta
+        context['sprat'] = firma.sprat
+        context['tip'] = firma.tip
+        context['naziv'] = firma.naziv
+
+    pos_terminals = Pos.objects.filter(idf=firma)
+
+    if pos_terminals:
+        context['pos_terminals'] = pos_terminals
+
+    promotions = Promocija.objects.filter(idf=firma.id)
+    if promotions:
+        context['promotions'] = promotions
+
+    return render(request, 'index.html', context)
 
 
 def aboutPage(request):
@@ -55,5 +80,37 @@ def faq(request):
     return None
 
 
+@login_required
 def dodajPopust(request):
     return render(request, 'dodajPopust.html')
+
+
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(username)
+        print(password)
+        firma_user = None
+
+        try:
+            firma_user = Firma.objects.get(username=username, password=password)
+        except Firma.DoesNotExist:
+            return render(request, 'login.html', {'error_message': 'Nevalidni podaci za logovanje'})
+
+        user = None
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+        else:
+            user = User.objects.create_user(username=username, password=password, email=firma_user.username)
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            request.session['logovan'] = 1
+            request.session['id'] = firma_user.id
+            return HttpResponseRedirect(reverse('landingPage'))
+        else:
+            return render(request, 'login.html', {'error_message': 'Autentifikacija neuspešna'})
+
+    return render(request, 'login.html')

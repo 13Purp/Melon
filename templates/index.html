@@ -9,7 +9,7 @@
                         <div class="col text-center">
                             <br>
                             <br>
-                            <h2 class="tm-section-title">Neka Kompanija</h2>
+                            <h2 class="tm-section-title">{{ naziv }} </h2>
 
                         </div>
                     </div>
@@ -25,17 +25,40 @@
                         <article class="col-sm-12 col-md-4 col-lg-4 col-xl-4 tm-article">                            
                             <i class="fa tm-fa-6x fa-compass tm-color-primary tm-margin-b-20"></i>
                             <h3 class="tm-color-primary tm-article-title-1">Strana sveta:</h3>
-                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">Zapad</h4>
+                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">
+                                 {% if strana_sveta %} 
+                                    {{ strana_sveta }} 
+                                {% else %} 
+                                    N/A 
+                                {% endif %}
+                                
+                            </h4>
                         </article>
                         <article class="col-sm-12 col-md-4 col-lg-4 col-xl-4 tm-article">                            
                             <i class="fa tm-fa-6x fa-chevron-up tm-color-primary tm-margin-b-20"></i>
                             <h3 class="tm-color-primary tm-article-title-1">Sprat:</h3>
-                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">Drugi</h4>
+                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">
+                                
+                                 {% if sprat %} 
+                                    {{ sprat }}. 
+                                {% else %} 
+                                    N/A 
+                                {% endif %}
+                            
+                            </h4>
                         </article>
                         <article class="col-sm-12 col-md-4 col-lg-4 col-xl-4 tm-article">                           
                             <i class="fa tm-fa-6x fa-suitcase tm-color-primary tm-margin-b-20"></i>
                             <h3 class="tm-color-primary tm-article-title-1">Tip:</h3>
-                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">Tehnika</h4>
+                            <h4  class="text-uppercase tm-color-primary tm-font-semibold">
+                                
+                                {% if tip %} 
+                                    {{ tip }} 
+                                {% else %} 
+                                    N/A 
+                                {% endif %}
+                            
+                            </h4>
                         </article>
                         <article class="col-sm-12 col-md-4 col-lg-12 col-xl-12 tm-article d-flex justify-content-center ">
                             <ul class="list-group  " style="width: 50%">
@@ -49,24 +72,20 @@
 
                                         </div>
                                       </li>
-                                       <li class="list-group-item">
-                                          <div class="d-flex justify-content-between tm-color-primary2 ">
-                                          <span class="align-content-center">ID: 3</span>
-                                          <span><img src="{% static 'img/img.png' %}" alt="" style="width: 45px; height: 45px;"></span>
-                                        </div>
-                                      </li>
-                                       <li class="list-group-item">
-                                          <div class="d-flex justify-content-between tm-color-primary2">
-                                          <span class="align-content-center">ID: 5</span>
-                                          <span><img src="{% static 'img/img.png' %}" alt="" style="width: 45px; height: 45px;"></span>
-                                        </div>
-                                      </li>
-                                       <li class="list-group-item">
-                                          <div class="d-flex justify-content-between tm-color-primary2">
-                                          <span class="align-content-center">ID: 7</span>
-                                          <span><img src="{% static 'img/img.png' %}" alt="" style="width: 45px; height: 45px;" ></span>
-                                        </div>
-                                      </li>
+                                       {% for pos in pos_terminals %}
+                                            <li class="list-group-item">
+                                                <div class="d-flex justify-content-between tm-color-primary2">
+                                                    <span class="align-content-center">ID: {{ pos.id }}</span>
+                                                    <span><img src="{% static 'img/img.png' %}" alt="" style="width: 45px; height: 45px;"></span>
+                                                </div>
+                                            </li>
+                                            {% empty %}
+                                            <li class="list-group-item">
+                                                <div class="d-flex justify-content-between tm-color-primary2">
+                                                    <span>Nema POS Terminala</span>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
                                     </ul>
                         </article>
                     </div>        
@@ -90,7 +109,7 @@
                                     </button>
                                   </h5>
                                 </div>
-
+                                {% load mathfilters %}
                                 <div id="collapseOne" class="collapse show " aria-labelledby="headingOne" data-parent="#accordion">
                                   <div class="card-body">
                                   <ul class="list-group">
@@ -104,36 +123,38 @@
 
                                         </div>
                                       </li>
+                                      {% for prom in promotions %}
                                       <li class="list-group-item">
                                         <div class="d-flex justify-content-between tm-color-primary2">
-                                          <span>ID: 1</span>
-                                          <span>100</span>
-                                          <span>57</span>
-                                          <span>24%</span>
-                                          <span><button class="tm-btn-white-bordered" onclick="showModal(1)"> Detalji</button></span>
+                                          <span>ID: {{ prom.id }}</span>
+                                          <span>{{ prom.ukupno }}</span>
+                                          <span>{{ prom.ukupno|sub:prom.iskorisceno }}</span>
+                                          <span>
+                                              {% if prom.flat_popust %} 
+                                                    {{ prom.flat_popust }}
+                                                {% else %} 
+                                                    {{ prom.procenat_popust }}%
+                                                {% endif %}
+                                          </span>
+                                          <span><button class="tm-btn-white-bordered" onclick="showModal({{ prom.id }})"> Detalji</button></span>
 
                                         </div>
                                       </li>
-                                      <li class="list-group-item">
-                                          <div class="d-flex justify-content-between tm-color-primary2">
-                                          <span>ID: 2</span>
-                                          <span>150</span>
-                                          <span>23</span>
-                                          <span>65%</span>
-                                          <span><button class="tm-btn-white-bordered" onclick="showModal(1)"> Detalji</button></span>
+                                      {% empty %}
+                                          
+                                          <li class="list-group-item">
+                                        <div class="d-flex justify-content-between tm-color-primary2">
+                                          <span>Nema Aktivnih Popusta</span>
+                                          <span></span>
+                                          <span></span>
+                                          <span></span>
+                                          <span></span>
 
                                         </div>
                                       </li>
-                                       <li class="list-group-item">
-                                          <div class="d-flex justify-content-between tm-color-primary2">
-                                          <span>ID: 3</span>
-                                          <span>30</span>
-                                          <span>150</span>
-                                          <span>5%</span>
-                                          <span><button class="tm-btn-white-bordered"> Detalji</button></span>
-
-                                        </div>
-                                      </li>
+                                          
+                                      {% endfor %}
+                                  
                                     </ul>
                                   </div>
                                 </div>
