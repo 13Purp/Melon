@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -105,7 +106,34 @@ def faq(request):
 
 @login_required
 def dodajPopust(request):
-    return render(request, 'dodajPopust.html')
+    prijavljenaFirmaId = request.session['id']
+    firme = Firma.objects.exclude(id=prijavljenaFirmaId)
+
+    if request.method == 'POST':
+        firms = request.POST.getlist('firmsList')
+        ukupno = request.POST.get('totalCount')
+        minimalan_iznos = request.POST.get('minAmount') or None
+        flat_popust = request.POST.get('flatDiscount') or None
+        procenat_popust = request.POST.get('percentDiscount') or None
+        max_iznos = request.POST.get('maxAmount') or None
+        datum_od = datetime.strptime(request.POST.get('startDate'), '%Y-%m-%d')
+        datum_do = datetime.strptime(request.POST.get('endDate'), '%Y-%m-%d')
+
+        promocija = Promocija.objects.create(
+            idf_id=prijavljenaFirmaId,
+            ukupno=ukupno,
+            iskorisceno=0,
+            minimalan_iznos=minimalan_iznos,
+            flat_popust=flat_popust,
+            procenat_popust=procenat_popust,
+            max_iznos=max_iznos,
+            od=datum_od,
+            do=datum_do
+        )
+        for firma_id in firms:
+            PopustFirma.objects.create(idp=promocija, idf_id=firma_id)
+        
+    return render(request, 'dodajPopust.html', {'firme':firme})
 
 
 def loginPage(request):

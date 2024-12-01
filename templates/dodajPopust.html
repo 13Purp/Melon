@@ -11,55 +11,50 @@
                                 <div class="tm-section  tm-section-pad">
                                   <h2 class="tm-section-title tm-color-primary text-center">Dodavanje Nove Promocije</h2>
                                   <form id="promotionForm tm-bg-white" style="background-color: white; box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.5);
-" class="tm-p-4" >
-                                    <!-- ID Promocije -->
-                                    <div class="form-group">
-                                      <label for="promotionId" class="tm-color-primary">ID Promocije:</label>
-                                      <input type="number" id="promotionId" class="form-control" placeholder="Unesite ID promocije" required>
-                                    </div>
-                                    <!-- Izabrane firme za koje važi popust -->
-                                    <div class="form-group">
-                                      <label for="firmsList" class="tm-color-primary">Firme za koje važi popust:</label>
-                                      <select id="firmsList" class="form-control" multiple required>
-                                        <!-- Dummy podaci -->
-                                        <option value="1">Firma A</option>
-                                        <option value="2">Firma B</option>
-                                        <option value="3">Firma C</option>
-                                        <option value="4">Firma D</option>
-                                      </select>
-                                      <small class="form-text text-muted">Držite Ctrl (Cmd na Mac-u) za izbor više firmi.</small>
-                                    </div>
+" class="tm-p-4" method="post" action="{% url 'dodajPopust' %}" >
+                                    {% csrf_token %}
+                                    
 
                                     <!-- Polja za detalje promocije -->
                                     <div class="form-group">
                                       <label for="totalCount" class="tm-color-primary">Ukupno:</label>
-                                      <input type="number" id="totalCount" class="form-control" placeholder="Unesite ukupno popusta" required>
+                                      <input type="number" id="totalCount" name = "totalCount" class="form-control" placeholder="Unesite ukupno popusta" required>
                                     </div>
                                     <div class="form-group">
                                       <label for="minAmount" class="tm-color-primary">Minimalan iznos:</label>
-                                      <input type="number" id="minAmount" class="form-control" placeholder="Unesite minimalan iznos za popust">
+                                      <input type="number" id="minAmount" name = "minAmount" class="form-control" placeholder="Unesite minimalan iznos za popust">
                                     </div>
                                     <div class="form-group">
                                       <label for="flatDiscount" class="tm-color-primary">Flat Popust:</label>
-                                      <input type="number" id="flatDiscount" class="form-control" placeholder="Unesite iznos flat popusta">
+                                      <input type="number" id="flatDiscount" name = "flatDiscount" class="form-control" placeholder="Unesite iznos flat popusta">
                                     </div>
                                     <div class="form-group">
                                       <label for="percentDiscount" class="tm-color-primary">Procenat Popusta:</label>
-                                      <input type="number" id="percentDiscount" class="form-control" placeholder="Unesite procenat popusta">
+                                      <input type="number" id="percentDiscount" name = "percentDiscount" class="form-control" placeholder="Unesite procenat popusta">
                                     </div>
                                     <div class="form-group">
                                       <label for="maxAmount" class="tm-color-primary">Maksimalan iznos:</label>
-                                      <input type="number" id="maxAmount" class="form-control" placeholder="Unesite maksimalan iznos popusta">
+                                      <input type="number" id="maxAmount" name = "maxAmount" class="form-control" placeholder="Unesite maksimalan iznos popusta">
                                     </div>
 
                                     <!-- Datum Od i Datum Do -->
                                     <div class="form-group">
                                       <label for="startDate" class="tm-color-primary">Datum Od:</label>
-                                      <input type="date" id="startDate" class="form-control" required>
+                                      <input type="date" id="startDate" name = "startDate" class="form-control" required>
                                     </div>
                                     <div class="form-group">
                                       <label for="endDate" class="tm-color-primary">Datum Do:</label>
-                                      <input type="date" id="endDate" class="form-control" required>
+                                      <input type="date" id="endDate" name = "endDate" class="form-control" required>
+                                    </div>
+                                    <!-- Izabrane firme za koje važi popust -->
+                                    <div class="form-group">
+                                      <label for="firmsList" class="tm-color-primary">Firme za koje važi popust:</label>
+                                      <select id="firmsList" name = "firmsList" class="form-control" multiple required>
+                                        {% for firma in firme %}
+                                          <option value='{{ firma.id }}'>{{ firma.naziv }}</option>
+                                        {% endfor %}
+                                      </select>
+                                      <small class="form-text text-muted">Držite Ctrl (Cmd na Mac-u) za izbor više firmi.</small>
                                     </div>
 
                                     <!-- Submit Dugme -->
