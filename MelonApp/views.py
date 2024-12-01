@@ -244,7 +244,7 @@ def get_top_transitions_as_json(target_store, exclude_stores=None, n=5):
     return data
 
 
-def store_transitions(request, store_name):
+def statistics(request, store_name):
     # You can add other parameters to the request if needed
     # For example: threshold, exclude_stores, etc.
 

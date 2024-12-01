@@ -30,7 +30,7 @@ urlpatterns = [
     path('clan/', views.clan, name="clan"),
     path('vesti/', views.vesti, name="vesti"),
     path('login/', views.loginPage, name="login"),
-    path('store-transitions/<str:store_name>/', views.store_transitions, name='store_transitions'),
+    path('statistics/<str:store_name>/', views.statistics, name='statistics'),
 ]
 
 #if settings.DEBUG:
