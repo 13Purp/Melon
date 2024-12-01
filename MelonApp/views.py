@@ -1,13 +1,16 @@
+from collections import defaultdict
 from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
-from MelonApp.models import Firma, Pos, Promocija, PopustFirma
+from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Transakcije
 
 
 @login_required
@@ -182,7 +185,56 @@ def stats(request):
                 "value": percentage_used
             })
 
-    print(chart_data)
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id, popust=False)
+
+    # Dictionary to store the counts of transactions per date
+    transaction_counts = defaultdict(int)
+
+    # Loop through the transactions and group by date
+    for trans in transactionsNoDiscount:
+        # Extract the date (ignoring time part)
+        date_only = trans.datum_vreme.date()
+
+        # Increment the count for that date
+        transaction_counts[date_only] += 1
+
+    # Prepare data for the chart
+    trans_chart_data = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+
+    # Sort the data by date
+    trans_chart_data.sort(key=lambda x: x['date'])
+
+    # Print the result (optional)
+    print("Transdata: ")
+    print(trans_chart_data)
+
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id)
+
+    # Dictionary to store the counts of transactions per date
+    transaction_counts = defaultdict(int)
+
+    # Loop through the transactions and group by date
+    for trans in transactionsNoDiscount:
+        # Extract the date (ignoring time part)
+        date_only = trans.datum_vreme.date()
+
+        # Increment the count for that date
+        transaction_counts[date_only] += 1
+
+    # Prepare data for the chart
+    trans_chart_dataall = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+    # Sort the data by date
+    trans_chart_dataall.sort(key=lambda x: x['date'])
+
+    # Print the result (optional)
+    print("TransdataAll: ")
+    print(trans_chart_dataall)
+
+
     return render(request, 'stats.html', {
-        "chart_data": chart_data
+        "chart_data": chart_data,
+        "trans_chart_data": trans_chart_data,
+        "trans_chart_dataall":trans_chart_dataall
     })

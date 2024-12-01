@@ -22,24 +22,14 @@
                 </svg>
                 <div class="container tm-pt-5 tm-pb-4">
                     <div class="row text-center">
-                            <article class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-article">
-                            <i class="fa tm-fa-6x fa-globe tm-color-primary tm-margin-b-20"></i>
-                            <h3 class="tm-color-primary tm-article-title-1">Sastav veteranskog odbora</h3>
-                            <h4 class=" tm-color-primary tm-article-title-2">Veteranski odbor TSS:</h4>
-                            <p>Miloš Jakovljević Predsednik</p>
-                             <h4 class=" tm-color-primary tm-article-title-2">Članovi:</h4>
-                            <p>Vlada Popović <br>
-                            Dejan Ratković<br>
-                            Višeslav Trnavac<br>
-                            Nenad Inić Istok<br></p>
-                             <h4 class=" tm-color-primary tm-article-title-2">Pridruženi članovi:</h4>
-                            <p>Ivan Vasić<br>
-                            Đorđe Motok <br></p>
+                            <article class="col-sm-12 col-md-12 col-lg-12 col-xl-6 tm-article">
+                            <h3 class="tm-color-primary tm-article-title-1">Transakcije</h3>
+                            <div class=" " id="line_chart_div"></div>
 
                         </article>
-                        <article class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-article">
+                        <article class="col-sm-12 col-md-12 col-lg-12 col-xl-6 tm-article">
                             <h3 class="tm-color-primary tm-article-title-1">Potrošnja kupona</h3>
-                            <div class="ml-5 pl-5 " id="chart_div"></div>
+                            <div class=" " id="chart_div"></div>
                         </article>
 
 
@@ -53,7 +43,7 @@
                     <div class="col text-center">
                         <br>
                         <br>
-                        <h1 class="tm-color-primary2 pb-5 font-weight-bold" >Izvod iz statuta teniskog saveza Srbije</h1>
+                        <h1 class="tm-color-primary2 pb-5 font-weight-bold" >Analiza i Preporuke</h1>
                     </div>
             </div>
 
@@ -123,7 +113,18 @@
         <script src="{% static 'js/jquery.singlePageNav.min.js' %}"></script>      <!-- Single Page Nav (https://github.com/ChrisWojcik/single-page-nav) -->
         <script src="{% static 'slick/slick.min.js' %}"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script><!-- http://kenwheeler.github.io/slick/ -->
-        <script>
+        <style>
+        #chart_div, #line_chart_div {
+            text-align: center;  /* Horizontally center */
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;  /* Horizontally center */
+            align-items: center;      /* Vertically center */
+            flex-direction: column;   /* Stack charts vertically */
+
+        }
+        </style>
+    <script>
 
             /* Google map
             ------------------------------------------------*/
@@ -233,13 +234,58 @@
                     // Set chart options
                     const options = {
                         title: '',
-                        width: 400,
-                        height: 300
+                        width: '100%',
+                        height: '100%',
+                         animation:{
+                        duration: 1000,
+                        easing: 'out',
+                        startup:true,
+                      },
+                        
                     };
 
                     // Instantiate and draw our chart
-                    const chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                    const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
                     chart.draw(data, options);
+
+                    const data2 = new google.visualization.DataTable();
+
+                    // Define the columns: Date, Trans Chart Data, Trans Chart Data All
+                    data2.addColumn('date', 'Date');
+                    data2.addColumn('number', 'Prodaja bez kupona');
+                    data2.addColumn('number', 'Prodaja sa kuponima');
+
+                    // Add rows for trans_chart_data
+                    {% for trans_data in trans_chart_data %}
+                      data2.addRow([new Date("{{ trans_data.date|date:'Y, M d' }}"), {{ trans_data.count }}, null]);
+                    {% endfor %}
+
+                    // Add rows for trans_chart_dataall (assuming it's in a similar format as trans_chart_data)
+                    {% for trans_data in trans_chart_dataall %}
+                      data2.addRow([new Date("{{ trans_data.date|date:'Y, M d' }}"), null, {{ trans_data.count }}]);
+                    {% endfor %}
+
+                    // Set chart options
+                    const options2 = {
+                      title: '',
+                      curveType: 'function',
+                      legend: { position: 'bottom' },
+                      width: '100%',
+                      height: '100%',
+                      animation:{
+                        duration: 1000,
+                        easing: 'out',
+                        startup:true,
+                      },
+                    };
+
+                    // Instantiate and draw the line chart
+                    const chart2 = new google.visualization.LineChart(document.getElementById('line_chart_div'));
+                    chart2.draw(data2, options2);
+
+
+
+
                 }
             $(document).ready(function(){
 
