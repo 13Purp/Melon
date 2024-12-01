@@ -30,6 +30,8 @@ urlpatterns = [
     path('clan/', views.clan, name="clan"),
     path('vesti/', views.vesti, name="vesti"),
     path('login/', views.loginPage, name="login"),
+    path('stats/',views.stats, name="stats"),
+
     path('statistics/<str:store_name>/', views.statistics, name='statistics'),
 ]
 
