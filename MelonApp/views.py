@@ -37,7 +37,7 @@ def get_promo_details(request, promo_id):
     promocija = get_object_or_404(Promocija, id=promo_id)
 
     firme = PopustFirma.objects.filter(idp=promo_id).select_related('idf')
-    firme_list = [{'naziv':firma.idf.naziv} for firma in firme]
+    firme_list = [{'naziv': firma.idf.naziv} for firma in firme]
 
     data = {
         "id": promocija.id,
@@ -52,8 +52,10 @@ def get_promo_details(request, promo_id):
     }
     return JsonResponse(data)
 
+
 def dodajPromociju(request):
     pass
+
 
 def aboutPage(request):
     return render(request, 'oNama.html')
@@ -137,3 +139,22 @@ def loginPage(request):
             return render(request, 'login.html', {'error_message': 'Autentifikacija neuspešna'})
 
     return render(request, 'login.html')
+
+@login_required
+def stats(request):
+    firma = Firma.objects.filter(username=request.user.username).first()
+    promotions = Promocija.objects.filter(idf = firma.id)
+
+    chart_data = []
+    for promo in promotions:
+        if promo.ukupno and promo.ukupno > 0:
+            percentage_used = promo.iskorisceno / promo.ukupno * 100
+            chart_data.append({
+                "name": f"Promo {promo.id}",
+                "value": percentage_used
+            })
+
+    print(chart_data)
+    return render(request, 'stats.html', {
+        "chart_data": chart_data
+    })
