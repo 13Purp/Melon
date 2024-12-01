@@ -9,6 +9,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+import pandas as pd
+from collections import defaultdict
 
 from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Transakcije
 
@@ -238,3 +240,89 @@ def stats(request):
         "trans_chart_data": trans_chart_data,
         "trans_chart_dataall":trans_chart_dataall
     })
+
+
+
+# statistics
+
+def get_top_transitions_as_json(target_store, exclude_stores=None, n=5):
+    # Load the CSV file (adjust the file path if necessary)
+    df = pd.read_csv('static/csv/gen2.csv')
+
+    # Preprocess the data
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df = df.sort_values(by=['customer_id', 'timestamp'])
+
+    markov_order = 3
+    food_stores = ['McDonalds', 'KFC', 'AsianFood', 'BurritoMadre', 'Obrock']  # penalty
+
+    transitions = defaultdict(lambda: defaultdict(int))
+
+    for customer_id, group in df.groupby('customer_id'):
+        visited_stores = group['store'].tolist()
+        for i in range(markov_order, len(visited_stores)):
+            previous_stores = tuple(visited_stores[i - markov_order:i])
+            current_store = visited_stores[i]
+
+            if current_store == previous_stores[-1]:
+                continue
+
+            # Apply penalty for transitions involving food stores
+            if any(store in food_stores for store in previous_stores) or current_store in food_stores:
+                probability_penalty = 0.05  # Increased penalty for food stores
+            else:
+                probability_penalty = 1.0
+
+            transitions[previous_stores][current_store] += probability_penalty
+
+    store_statistics = {}
+    for sequence, incoming_transitions in transitions.items():
+        total_visits = sum(incoming_transitions.values())
+        if total_visits > 0:
+            store_statistics[sequence] = {
+                next_store: count / total_visits
+                for next_store, count in incoming_transitions.items()
+            }
+
+    # Exclude stores if not provided (default: food stores)
+    if exclude_stores is None:
+        exclude_stores = food_stores
+
+    # Get top transitions
+    direct_transitions = defaultdict(float)
+
+    for sequence, stats in store_statistics.items():
+        for next_store, probability in stats.items():
+            if next_store == target_store:
+                for prev_store in sequence:
+                    if prev_store not in exclude_stores:
+                        direct_transitions[prev_store] += probability
+
+    total_probability = sum(direct_transitions.values())
+    if total_probability > 0:
+        for store in direct_transitions:
+            direct_transitions[store] /= total_probability
+
+    data = []
+    for store, probability in direct_transitions.items():
+        data.append({
+            'store': store,
+            'probability': probability
+        })
+
+    # Sort the results and limit to top n
+    data = sorted(data, key=lambda x: x['probability'], reverse=True)[:n]
+
+    return data
+
+
+def statistics(request, store_name):
+    # You can add other parameters to the request if needed
+    # For example: threshold, exclude_stores, etc.
+
+    data = get_top_transitions_as_json(store_name)
+
+    # Return JSON response
+    return JsonResponse(data, safe=False)
+
+
