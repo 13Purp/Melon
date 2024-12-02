@@ -189,52 +189,40 @@ def stats(request):
 
     transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id, popust=False)
 
-    # Dictionary to store the counts of transactions per date
     transaction_counts = defaultdict(int)
 
-    # Loop through the transactions and group by date
     for trans in transactionsNoDiscount:
-        # Extract the date (ignoring time part)
         date_only = trans.datum_vreme.date()
 
-        # Increment the count for that date
         transaction_counts[date_only] += 1
 
-    # Prepare data for the chart
     trans_chart_data = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
 
 
-    # Sort the data by date
     trans_chart_data.sort(key=lambda x: x['date'])
 
 
     transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id)
 
-    # Dictionary to store the counts of transactions per date
     transaction_counts = defaultdict(int)
 
-    # Loop through the transactions and group by date
     for trans in transactionsNoDiscount:
-        # Extract the date (ignoring time part)
         date_only = trans.datum_vreme.date()
 
-        # Increment the count for that date
         transaction_counts[date_only] += 1
 
-    # Prepare data for the chart
     trans_chart_dataall = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
 
-    # Sort the data by date
     trans_chart_dataall.sort(key=lambda x: x['date'])
 
-    # Print the result (optional)
 
 
 
     return render(request, 'stats.html', {
         "chart_data": chart_data,
         "trans_chart_data": trans_chart_data,
-        "trans_chart_dataall":trans_chart_dataall
+        "trans_chart_dataall":trans_chart_dataall,
+        "store_id":firma.id
     })
 
 
@@ -256,6 +244,7 @@ def get_top_transitions(request, store_id):
 
     # Get the top transitions for this store using the name fetched from the database
     json_response = get_top_transitions_as_json(store.id)
+    print(json_response)
 
     # Return the JSON response
     return JsonResponse(json_response, safe=False)

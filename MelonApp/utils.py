@@ -110,7 +110,7 @@ def get_top_transitions_as_json(store_id, n=5):
             direct_transitions[store] /= total_probability
 
     # Create the final data list and sort
-    data = [{'store_id': store, 'probability': probability} for store, probability in direct_transitions.items()]
+    data = [{'store': Firma.objects.get(id=store).naziv, 'probability': probability*100} for store, probability in direct_transitions.items()]
     data = sorted(data, key=lambda x: x['probability'], reverse=True)[:n]
 
     return data
