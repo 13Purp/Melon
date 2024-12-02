@@ -1,13 +1,18 @@
+from collections import defaultdict
 from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+import pandas as pd
+from collections import defaultdict
 
-from MelonApp.models import Firma, Pos, Promocija, PopustFirma
+from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Transakcije
 
 
 @login_required
@@ -38,7 +43,7 @@ def get_promo_details(request, promo_id):
     promocija = get_object_or_404(Promocija, id=promo_id)
 
     firme = PopustFirma.objects.filter(idp=promo_id).select_related('idf')
-    firme_list = [{'naziv':firma.idf.naziv} for firma in firme]
+    firme_list = [{'naziv': firma.idf.naziv} for firma in firme]
 
     data = {
         "id": promocija.id,
@@ -53,8 +58,10 @@ def get_promo_details(request, promo_id):
     }
     return JsonResponse(data)
 
+
 def dodajPromociju(request):
     pass
+
 
 def aboutPage(request):
     return render(request, 'oNama.html')
@@ -165,3 +172,81 @@ def loginPage(request):
             return render(request, 'login.html', {'error_message': 'Autentifikacija neuspešna'})
 
     return render(request, 'login.html')
+
+@login_required
+def stats(request):
+    firma = Firma.objects.filter(username=request.user.username).first()
+    promotions = Promocija.objects.filter(idf = firma.id)
+
+    chart_data = []
+    for promo in promotions:
+        if promo.ukupno and promo.ukupno > 0:
+            percentage_used = promo.iskorisceno / promo.ukupno * 100
+            chart_data.append({
+                "name": f"Promo {promo.id}",
+                "value": percentage_used
+            })
+
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id, popust=False)
+
+    transaction_counts = defaultdict(int)
+
+    for trans in transactionsNoDiscount:
+        date_only = trans.datum_vreme.date()
+
+        transaction_counts[date_only] += 1
+
+    trans_chart_data = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+
+    trans_chart_data.sort(key=lambda x: x['date'])
+
+
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id)
+
+    transaction_counts = defaultdict(int)
+
+    for trans in transactionsNoDiscount:
+        date_only = trans.datum_vreme.date()
+
+        transaction_counts[date_only] += 1
+
+    trans_chart_dataall = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+    trans_chart_dataall.sort(key=lambda x: x['date'])
+
+
+
+
+    return render(request, 'stats.html', {
+        "chart_data": chart_data,
+        "trans_chart_data": trans_chart_data,
+        "trans_chart_dataall":trans_chart_dataall,
+        "store_id":firma.id
+    })
+
+
+
+# statistics
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Firma
+from .utils import get_top_transitions_as_json  # Import the function that processes transitions
+
+def get_top_transitions(request, store_id):
+    # Fetch the store name from the database using the provided store_id
+    try:
+        store = Firma.objects.get(id=store_id)
+        store_name = store.naziv
+    except Firma.DoesNotExist:
+        return JsonResponse({'error': 'Store not found'}, status=404)
+
+    # Get the top transitions for this store using the name fetched from the database
+    json_response = get_top_transitions_as_json(store.id)
+    print(json_response)
+
+    # Return the JSON response
+    return JsonResponse(json_response, safe=False)
+
+

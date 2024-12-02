@@ -30,7 +30,9 @@ urlpatterns = [
     path('clan/', views.clan, name="clan"),
     path('vesti/', views.vesti, name="vesti"),
     path('login/', views.loginPage, name="login"),
+    path('stats/',views.stats, name="stats"),
 
+    path('statistics/<int:store_id>/', views.get_top_transitions, name='statistics'),
 ]
 
 #if settings.DEBUG:
