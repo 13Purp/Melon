@@ -81,12 +81,49 @@
                 <div class="container">
                     <div class="row">
                         <p class="col-sm-12 text-center tm-font-light tm-color-white p-4 tm-margin-b-0">
-                        Copyright &copy; <span class="tm-current-year">2024</span> Teniski Veterani Srbije
+                        Copyright &copy; <span class="tm-current-year">2024</span> Melon
                         
                     </div>
                 </div>                
             </footer>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const flatDiscount = document.getElementById("flatDiscount");
+                const percentDiscount = document.getElementById("percentDiscount");
+                const maxAmount = document.getElementById("maxAmount");
+        
+                // Funkcija za onemogućavanje ili omogućavanje polja
+                function toggleFields(disabled, ...fields) {
+                    fields.forEach(field => {
+                        field.disabled = disabled;
+                        if (disabled) {
+                            field.value = ""; // Resetuje vrednost polja
+                        }
+                    });
+                }
+        
+                // Dodavanje event listenera za flat popust
+                flatDiscount.addEventListener("input", function () {
+                    if (flatDiscount.value) {
+                        toggleFields(true, percentDiscount, maxAmount);
+                    } else {
+                        toggleFields(false, percentDiscount, maxAmount);
+                    }
+                });
+        
+                // Dodavanje event listenera za procenat popusta i maksimalan iznos
+                [percentDiscount, maxAmount].forEach(field => {
+                    field.addEventListener("input", function () {
+                        if (percentDiscount.value || maxAmount.value) {
+                            toggleFields(true, flatDiscount);
+                        } else {
+                            toggleFields(false, flatDiscount);
+                        }
+                    });
+                });
+            });
+        </script>
 {% endblock %}
 
 {% block scripts %}
