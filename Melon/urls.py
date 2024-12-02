@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from MelonApp import views
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('api/', include('MelonApp.api_urls')),
     path('<int:promo_id>', views.get_promo_details, name='get_promo_details'),
     path('', views.landingPage, name="landingPage"),
     path('admin/', admin.site.urls),
