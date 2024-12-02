@@ -85,11 +85,11 @@ class IzvrsiTransakcijuView(APIView):
                 popust.save()
 
             if Popust.objects.filter(encrypted_card=hashedpan_blob,iskoriscen=False).exists():
-               return Response({"cupon" : False, "message" : "Niste ostvarili popust\n"+parkingPourka}, status=status.HTTP_200_OK)
+               return Response({"cupon" : False, "message" : "Niste ostvarili popust. "+parkingPourka}, status=status.HTTP_200_OK)
 
             moguce_promocije = PopustFirma.objects.filter(idf = firma.id).select_related('idp')
             if len(moguce_promocije) < 1:
-                return Response({"cupon" : False, "message" : "Niste ostvarili popust\n"+parkingPourka}, status=status.HTTP_200_OK)
+                return Response({"cupon" : False, "message" : "Niste ostvarili popust. "+parkingPourka}, status=status.HTTP_200_OK)
 
             promocijeDict = {promocija.idp.id:promocija.idp for promocija in moguce_promocije}
             izabranaPromocija = None
@@ -111,15 +111,15 @@ class IzvrsiTransakcijuView(APIView):
                 promo.save()
                 if izabranaPromocija.flat_popust:
                     return Response({"cupon" : True, 
-                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.flat_popust}\n"+parkingPourka}, 
+                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.flat_popust}. "+parkingPourka}, 
                                  status=status.HTTP_200_OK)
                 
                 return Response({"cupon" : True, 
-                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.procenat_popust}% do {izabranaPromocija.max_iznos}rsd\n"+parkingPourka}, 
+                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.procenat_popust}% do {izabranaPromocija.max_iznos}rsd. "+parkingPourka}, 
                                  status=status.HTTP_200_OK)
             return Response({
                     "cupon" : False,
-                    "message" : "Niste ostvarili popust\n"+parkingPourka
+                    "message" : "Niste ostvarili popust. "+parkingPourka
                     },status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
