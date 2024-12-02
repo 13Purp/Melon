@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g1=-@(x#q**(45sdok9iw(sct!*78s*l35pn^l0r$6wa2(p(41
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'MelonApp.apps.MelonappConfig',
     'mathfilters',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
