@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Popust, Transakcije
+from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Popust, Transakcije, Parking
 from datetime import datetime
 
 
@@ -61,17 +61,35 @@ class IzvrsiTransakcijuView(APIView):
             novaTransakcija = Transakcije(id_f = firma, encrypted_card = hashedpan_blob, iznos = iznos, datum_vreme = datetime.now(), popust = kupon)
             novaTransakcija.save()
 
+
+            parkingPourka = ""
+            parking = None
+            if Parking.objects.filter(encrypted_card = hashedpan_blob).exists():
+                parking = Parking.objects.get(encrypted_card = hashedpan_blob)
+                parking.iznos += iznos
+            else:
+                parking = Parking(encrypted_card = hashedpan_blob, iznos = iznos)
+            parking.save()
+            if not parking.ostvaren:
+                if parking.iznos >= 1000:
+                    parkingPourka = "Cestitam! ostvarili ste besplatan parking"
+                    parking.ostvaren = True
+                    parking.save()
+                else:
+                    parkingPourka = f"Potrosite jos {1000-parking.iznos}rsd da bi ste ostvarili besplatan parking"
+            
+
             if idPopusta:
                 popust = Popust.objects.get(id=idPopusta)
                 popust.iskoriscen = True
                 popust.save()
 
             if Popust.objects.filter(encrypted_card=hashedpan_blob,iskoriscen=False).exists():
-               return Response({"cupon" : False, "message" : "Niste ostvarili popust"}, status=status.HTTP_200_OK)
+               return Response({"cupon" : False, "message" : "Niste ostvarili popust\n"+parkingPourka}, status=status.HTTP_200_OK)
 
             moguce_promocije = PopustFirma.objects.filter(idf = firma.id).select_related('idp')
             if len(moguce_promocije) < 1:
-                return Response({"cupon" : False, "message" : "Niste ostvarili popust"}, status=status.HTTP_200_OK)
+                return Response({"cupon" : False, "message" : "Niste ostvarili popust\n"+parkingPourka}, status=status.HTTP_200_OK)
 
             promocijeDict = {promocija.idp.id:promocija.idp for promocija in moguce_promocije}
             izabranaPromocija = None
@@ -93,15 +111,15 @@ class IzvrsiTransakcijuView(APIView):
                 promo.save()
                 if izabranaPromocija.flat_popust:
                     return Response({"cupon" : True, 
-                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.flat_popust}"}, 
+                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.flat_popust}\n"+parkingPourka}, 
                                  status=status.HTTP_200_OK)
                 
                 return Response({"cupon" : True, 
-                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.procenat_popust}% do {izabranaPromocija.max_iznos}rsd"}, 
+                                 "message" : f"Ostarili ste popust u kompaniji {izabranaPromocija.idf.naziv} u iznosu od {izabranaPromocija.procenat_popust}% do {izabranaPromocija.max_iznos}rsd\n"+parkingPourka}, 
                                  status=status.HTTP_200_OK)
             return Response({
                     "cupon" : False,
-                    "message" : "Niste ostvarili popust"
+                    "message" : "Niste ostvarili popust\n"+parkingPourka
                     },status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

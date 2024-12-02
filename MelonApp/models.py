@@ -115,6 +115,7 @@ class Parking(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True, blank=True)  # Auto-increment primary key
     encrypted_card = models.BinaryField(db_column='ENCRYPTED_CARD', blank=True, null=True)  # Field for encrypted card
     iznos = models.IntegerField(db_column='IZNOS', blank=True, null=True)  # Field for amount
+    ostvaren = models.BooleanField(db_column='OSTVAREN', blank=True, null=True, default=False)
 
     class Meta:
         managed = False  # Don't let Django manage the database schema
