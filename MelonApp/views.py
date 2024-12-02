@@ -207,9 +207,6 @@ def stats(request):
     # Sort the data by date
     trans_chart_data.sort(key=lambda x: x['date'])
 
-    # Print the result (optional)
-    print("Transdata: ")
-    print(trans_chart_data)
 
     transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id)
 
@@ -231,8 +228,7 @@ def stats(request):
     trans_chart_dataall.sort(key=lambda x: x['date'])
 
     # Print the result (optional)
-    print("TransdataAll: ")
-    print(trans_chart_dataall)
+
 
 
     return render(request, 'stats.html', {
@@ -316,11 +312,12 @@ def get_top_transitions_as_json(target_store, exclude_stores=None, n=5):
     return data
 
 
-def statistics(request, store_name):
+def statistics(request):
     # You can add other parameters to the request if needed
     # For example: threshold, exclude_stores, etc.
 
-    data = get_top_transitions_as_json(store_name)
+    data = get_top_transitions_as_json('Gigatron')
+    print(data)
 
     # Return JSON response
     return JsonResponse(data, safe=False)
