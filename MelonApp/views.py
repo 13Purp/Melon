@@ -1,13 +1,18 @@
+from collections import defaultdict
 from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+import pandas as pd
+from collections import defaultdict
 
-from MelonApp.models import Firma, Pos, Promocija, PopustFirma
+from MelonApp.models import Firma, Pos, Promocija, PopustFirma, Transakcije
 
 
 @login_required
@@ -182,7 +187,66 @@ def stats(request):
                 "value": percentage_used
             })
 
-    print(chart_data)
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id, popust=False)
+
+    transaction_counts = defaultdict(int)
+
+    for trans in transactionsNoDiscount:
+        date_only = trans.datum_vreme.date()
+
+        transaction_counts[date_only] += 1
+
+    trans_chart_data = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+
+    trans_chart_data.sort(key=lambda x: x['date'])
+
+
+    transactionsNoDiscount = Transakcije.objects.filter(id_f=firma.id)
+
+    transaction_counts = defaultdict(int)
+
+    for trans in transactionsNoDiscount:
+        date_only = trans.datum_vreme.date()
+
+        transaction_counts[date_only] += 1
+
+    trans_chart_dataall = [{'date': date, 'count': count} for date, count in transaction_counts.items()]
+
+    trans_chart_dataall.sort(key=lambda x: x['date'])
+
+
+
+
     return render(request, 'stats.html', {
-        "chart_data": chart_data
+        "chart_data": chart_data,
+        "trans_chart_data": trans_chart_data,
+        "trans_chart_dataall":trans_chart_dataall,
+        "store_id":firma.id
     })
+
+
+
+# statistics
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Firma
+from .utils import get_top_transitions_as_json  # Import the function that processes transitions
+
+def get_top_transitions(request, store_id):
+    # Fetch the store name from the database using the provided store_id
+    try:
+        store = Firma.objects.get(id=store_id)
+        store_name = store.naziv
+    except Firma.DoesNotExist:
+        return JsonResponse({'error': 'Store not found'}, status=404)
+
+    # Get the top transitions for this store using the name fetched from the database
+    json_response = get_top_transitions_as_json(store.id)
+    print(json_response)
+
+    # Return the JSON response
+    return JsonResponse(json_response, safe=False)
+
+
