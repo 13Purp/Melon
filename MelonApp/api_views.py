@@ -62,21 +62,22 @@ class IzvrsiTransakcijuView(APIView):
             novaTransakcija.save()
 
 
-            parkingPourka = ""
-            parking = None
-            if Parking.objects.filter(encrypted_card = hashedpan_blob).exists():
-                parking = Parking.objects.get(encrypted_card = hashedpan_blob)
-                parking.iznos += iznos
-            else:
-                parking = Parking(encrypted_card = hashedpan_blob, iznos = iznos)
-            parking.save()
-            if not parking.ostvaren:
-                if parking.iznos >= 1000:
-                    parkingPourka = "Cestitam! ostvarili ste besplatan parking"
-                    parking.ostvaren = True
-                    parking.save()
-                else:
-                    parkingPourka = f"Potrosite jos {1000-parking.iznos}rsd da bi ste ostvarili besplatan parking"
+            parkingPourka = "Cena parkinga je umanjena za 1h" if idPos == 24 else ""
+            #Zakomentarisano zbog ogranicenog vremena prezentovanja
+            #parking = None
+            #if Parking.objects.filter(encrypted_card = hashedpan_blob).exists():
+            #    parking = Parking.objects.get(encrypted_card = hashedpan_blob)
+            #    parking.iznos += iznos
+            #else:
+            #    parking = Parking(encrypted_card = hashedpan_blob, iznos = iznos)
+            #parking.save()
+            #if not parking.ostvaren:
+            #    if parking.iznos >= 1000:
+            #        parkingPourka = "Cestitam! ostvarili ste besplatan parking"
+            #        parking.ostvaren = True
+            #        parking.save()
+            #    else:
+            #        parkingPourka = f"Potrosite jos {1000-parking.iznos}rsd da bi ste ostvarili besplatan parking"
             
 
             if idPopusta:
